@@ -109,6 +109,8 @@ class ServerConfig(object):
     REDIS_PASSWORD: str = empty_str_cast(config_ini["server"]["REDIS_PASSWORD"])
     REDIS_PORT: int = empty_str_cast(config_ini["server"]["REDIS_PORT"]) or 6379
     REDIS_DB: int = empty_str_cast(config_ini["server"]["REDIS_DB"]) or 0
+    
+    REDIS_CLUSTER: bool = process_boolean_str(empty_str_cast(config_ini["server"]["REDIS_CLUSTER"]), default=False)
 
     if REDIS_URL or REDIS_HOST is None:
         CACHE_REDIS_URL = REDIS_URL
@@ -123,7 +125,7 @@ class ServerConfig(object):
 
     SQLALCHEMY_DATABASE_URI = DATABASE_URL
     if CACHE_REDIS_URL:
-        CACHE_TYPE: str = "redis"
+        CACHE_TYPE: str = "rediscluster" if REDIS_CLUSTER else "redis"
     else:
         CACHE_TYPE: str = "filesystem"
         CACHE_DIR: str = os.path.join(
